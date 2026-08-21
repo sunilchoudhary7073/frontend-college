@@ -1,0 +1,41 @@
+const express = require("express")
+const router = express.Router()
+
+const userRouter = require("./userRouter")
+const studentrouter = require("./studentRouter")
+const courserouter = require('./courseRouter')
+const facultyrouter = require("./facultyRouter")
+const batchrouter = require("./batchRouter")
+const feesrouter = require("./feesRouter")
+const eventrouter = require("./eventRouter")
+const adminrouter = require("./adminrouter")
+const examrouter = require("./examRouter")
+const noticerouter = require("./noticeRouter")
+const admissionrouter = require("./admissionRouter")
+const placementrouter = require("./placementRouter")
+const contactrouter=require('./contactRouter')
+const assineCourserouter=require('./assinecourseRouter')
+const Subjectrouter=require('./SubjectRouter')
+const Inquirerouter=require('./InquireRouter')
+
+router.use("/Admin", adminrouter)
+router.use("/user", userRouter)
+router.use("/student", studentrouter)
+router.use("/course", courserouter)
+router.use("/Teacher", facultyrouter)
+router.use("/batch", batchrouter)
+router.use("/Fees", feesrouter)
+router.use("/event", eventrouter)
+router.use("/exam", examrouter)
+router.use("/notice", noticerouter)
+router.use("/admission", admissionrouter)
+router.use("/placement", placementrouter)
+router.use("/contact",contactrouter)
+router.use("/Assinecourse",assineCourserouter)
+router.use("/subject",Subjectrouter)
+router.use("/inquire",Inquirerouter)
+
+
+
+
+module.exports = router
