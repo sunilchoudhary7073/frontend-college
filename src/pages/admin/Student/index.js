@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Swal from "sweetalert2";
 
-import { FaEdit, FaTrash ,FaUserPlus} from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 import StudentDeatials from './StudentDeatials';
 import Loader from "../../../Components/Loader";
-import { ViewAllStudent, Delete, Update, UpdateStudentStatus } from '../../../Service/admin/collage'
+import { ViewAllStudent, Delete, Update, UpdateStudentStatus, SearchStudent } from '../../../Service/admin/collage'
 
 
 
@@ -19,18 +19,24 @@ export default function StudentList() {
 
   const [students, setStudents] = useState([])
   const [open, setOpen] = useState(false);
-const [loading,setLoading]=useState(true)
-const [studentDetails, setStudentDetails] = useState(null);;
+  const [loading, setLoading] = useState(true)
+  const [studentDetails, setStudentDetails] = useState(null);;
   const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(7)
+  const [limit, setLimit] = useState(10)
   const [totalPages, setTotalPages] = useState(1)
+
+  const [StudentName, setstudentName] = useState("");
+
+  const [isSearching, setIsSearching] = useState(false);
 
 
   useEffect(() => {
-    getStudents()
-
-
-  }, [page, limit])
+    if (isSearching) {
+      searchStudents();
+    } else {
+      getStudents();
+    }
+  }, [page, limit, isSearching]);
 
 
   const getStudents = async () => {
@@ -143,6 +149,43 @@ const [studentDetails, setStudentDetails] = useState(null);;
     }
   };
 
+ const handleSearch = (e) => {
+  e.preventDefault();
+
+  if (!StudentName.trim()) {
+    setIsSearching(false);
+    setPage(1);
+    return;
+  }
+
+  setPage(1);
+  setIsSearching(true);
+};
+
+const searchStudents = async () => {
+  try {
+    setLoading(true);
+
+    const body = {
+      StudentName: StudentName.trim(),
+    };
+
+    const res = await SearchStudent(page, limit, body);
+
+    console.log("SEARCH RESPONSE:", res);
+
+    setStudents(res.data || []);
+    setTotalPages(res.totalPages || 1);
+
+  } catch (error) {
+    console.log("SEARCH ERROR:", error);
+
+    setStudents([]);
+    setTotalPages(1);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div>
 
@@ -165,8 +208,55 @@ const [studentDetails, setStudentDetails] = useState(null);;
 
         </div>
 
+        <div>
+          <form
+            onSubmit={handleSearch}
+            className="flex items-end gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-6"
+          >
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Student Name
+              </label>
+
+              <input
+                type="text"
+                value={StudentName}
+                onChange={(e) => setstudentName(e.target.value)}
+                placeholder="Enter  Student Name..."
+                className="w-full h-12 px-4 rounded-xl border border-slate-300 focus:border-violet-600 focus:ring-2 focus:ring-violet-100 outline-none"
+              />
+            </div>
+
+
+
+            <button
+              type="submit"
+              className="h-12 px-8 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold transition"
+            >
+              Search
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setstudentName("");
+                setIsSearching(false);
+                setPage(1);
+              }}
+              className="h-12 px-6 rounded-xl bg-gray-500 text-white"
+            >
+              Clear
+            </button>
+          </form>
+
+
+
+        </div>
+
         {/* Table */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+
+
 
 
 
@@ -176,13 +266,18 @@ const [studentDetails, setStudentDetails] = useState(null);;
           ) : (
 
             <div className="overflow-x-hidden">
+
+
+
+
+
               <table className="min-w-full text-left">
                 <thead>
 
 
                   <tr>
                     <th className="px-5 py-3 text-left">Name</th>
-  
+
                     <th className="px-5 py-3 text-left">Email</th>
                     <th className="px-5 py-3 text-left">Course</th>
                     <th className="px-5 py-3 text-left">DOB</th>
@@ -208,7 +303,7 @@ const [studentDetails, setStudentDetails] = useState(null);;
                       </td>
 
 
-                    
+
                       <td className="px-5 py-4">{student.email}</td>
                       <td className="px-5 py-4">{student.Course?.courseName}</td>
 
@@ -233,7 +328,7 @@ const [studentDetails, setStudentDetails] = useState(null);;
                             <div className="absolute left-1 top-1 w-5 h-5 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
                           </label>
 
-                         
+
 
                           <Link
                             to={`/admin/Student/edit/${student._id}`}
@@ -261,7 +356,6 @@ const [studentDetails, setStudentDetails] = useState(null);;
                 </tbody>
 
               </table>
-
               <div className="flex items-center justify-between border-t border-white/10 px-4 py-3 sm:px-6">
 
                 <div className="flex flex-1 justify-between sm:hidden">
@@ -275,75 +369,54 @@ const [studentDetails, setStudentDetails] = useState(null);;
                 </div>
 
 
-                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <nav
+                  aria-label="Pagination"
+                  className="isolate inline-flex -space-x-px rounded-md"
+                >
+                  {/* Previous */}
+                  <button
+                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={page === 1}
+                    className={`relative inline-flex items-center rounded-l-md px-2 py-2 ${page === 1
+                      ? "cursor-not-allowed opacity-50"
+                      : "hover:bg-white/5 cursor-pointer"
+                      }`}
+                  >
+                    Previous
+                  </button>
 
+                  {/* Page Numbers */}
+                  {[...Array(totalPages)].map((_, index) => {
+                    const pageNumber = index + 1;
 
-
-                  <div>
-                    <nav
-                      aria-label="Pagination"
-                      className="isolate inline-flex -space-x-px rounded-md"
-                    >
-
-
-
+                    return (
                       <button
-                        onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                        disabled={page === 1}
-                        className={`relative inline-flex items-center rounded-l-md px-2 py-2${page === 1
-                          ? "cursor-not-allowed opacity-50"
-                          : "hover:bg-white/5 cursor-pointer"
+                        key={pageNumber}
+                        onClick={() => setPage(pageNumber)}
+                        className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${page === pageNumber
+                          ? "bg-indigo-500 text-white"
+                          : "text-gray-200 hover:bg-white/5"
                           }`}
                       >
-                        <span className="sr-only">Previous</span>
-
-                        <svg
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          className="w-5 h-5"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                            d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"
-                          />
-                        </svg>
+                        {pageNumber}
                       </button>
+                    );
+                  })}
 
-
-                      <button className="relative z-10 inline-flex items-center bg-indigo-500 px-4 py-2 text-sm font-semibold text-white">
-                        1
-                      </button>
-
-                      <button className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-200 inset-ring inset-ring-gray-700 hover:bg-white/5">
-                        2
-                      </button>
-
-
-
-
-                      <button
-                        onClick={() => setPage(page + 1)}
-                        className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 inset-ring inset-ring-gray-700 hover:bg-white/5 cursor-pointer"
-                      >
-                        <span className="sr-only">Next</span>
-
-                        <svg
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          className="w-5 h-5"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                            d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-                          />
-                        </svg>
-                      </button>
-                    </nav>
-                  </div>
-                </div>
+                  {/* Next */}
+                  <button
+                    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={page === totalPages}
+                    className={`relative inline-flex items-center rounded-r-md px-2 py-2 ${page === totalPages
+                      ? "cursor-not-allowed opacity-50"
+                      : "hover:bg-white/5 cursor-pointer"
+                      }`}
+                  >
+                    Next
+                  </button>
+                </nav>
               </div>
+
 
 
             </div>
@@ -355,11 +428,11 @@ const [studentDetails, setStudentDetails] = useState(null);;
       </div>
 
 
-  <StudentDeatials
-  open={open}
-  onClose={() => setOpen(false)}
-  student={studentDetails}
-/>
+      <StudentDeatials
+        open={open}
+        onClose={() => setOpen(false)}
+        student={studentDetails}
+      />
 
     </div>
   )

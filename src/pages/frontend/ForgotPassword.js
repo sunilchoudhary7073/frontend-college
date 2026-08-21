@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import{ForgetePassword as ForgetePasswordApi , VerifyForgotEmail,} from '../../Service/frontend/login'
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -9,62 +10,94 @@ const ForgotPassword = () => {
   const [error, setError] = useState('');
 
   // ----- Step 1: Verify Email -----
-  const handleVerify = async (e) => {
-    e.preventDefault();
-    setError('');
+const handleVerify = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    if (!email.trim()) {
-      setError('Email is required.');
-      return;
-    }
-    if (!email.includes('@') || !email.includes('.')) {
-      setError('Please enter a valid email address.');
-      return;
+  if (!email.trim()) {
+    setError("Email is required.");
+    return;
+  }
+
+  if (!email.includes("@") || !email.includes(".")) {
+    setError("Please enter a valid email address.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const res = await VerifyForgotEmail(email.trim());
+
+    console.log("Forgot Password Response:", res);
+
+    if (res?.success || res?.status) {
+      setStep("reset");
+    } else {
+      setError(res?.message || "Email verification failed.");
     }
 
-    setLoading(true);
-    try {
-      // Simulate API call to send verification (or just verify)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      // In a real app, you would send a code to email and ask for it.
-      // For this demo, we assume verification is successful.
-      setStep('reset');
-    } catch (err) {
-      setError('Verification failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (err) {
+    console.log("Forgot Password Error:", err);
 
+    setError(
+      err?.response?.data?.message ||
+      "Email verification failed. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   // ----- Step 2: Reset Password -----
-  const handleReset = async (e) => {
-    e.preventDefault();
-    setError('');
+const handleReset = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    if (!password.trim()) {
-      setError('Password is required.');
-      return;
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
-      return;
+  if (!password.trim()) {
+    setError("Password is required.");
+    return;
+  }
+
+  if (password.length < 6) {
+    setError("Password must be at least 6 characters.");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    setError("Passwords do not match.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    console.log("Email:", email);
+    console.log("New Password:", password);
+
+    const res = await ForgetePasswordApi(
+      email.trim(),
+      password
+    );
+
+    console.log("Reset Password Response:", res);
+
+    if (res?.success) {
+      setStep("success");
+    } else {
+      setError(res?.message || "Failed to reset password.");
     }
 
-    setLoading(true);
-    try {
-      // Simulate API call to reset password
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setStep('success');
-    } catch (err) {
-      setError('Failed to reset password. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (err) {
+    console.log("Reset Password Error:", err);
+
+    setError(
+      err?.response?.data?.message ||
+      "Failed to reset password. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   // ----- Render -----
   return (

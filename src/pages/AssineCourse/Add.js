@@ -4,8 +4,8 @@ import Swal from "sweetalert2";
 
 import { Formik, useFormik } from 'formik';
 import *as Yup from 'yup'
-import { AddCourseAssine } from '../../Service/admin/AssineCourse';
-import { ViewAllStudent, } from '../../Service/admin/collage'
+import { AddCourseAssine,FindOneAssinecourse } from '../../Service/admin/AssineCourse';
+import { ViewAllStudent } from '../../Service/admin/collage'
 
 import { ViewAllCourse } from '../../Service/admin/Course'
 // import { text } from 'express';
@@ -18,6 +18,7 @@ export default function CourseAssineAdd() {
 
     const [students, setStudents] = useState([])
     const [courses, setCourses] = useState([])
+
 
     const formik = useFormik({
         initialValues: {
@@ -120,6 +121,8 @@ export default function CourseAssineAdd() {
     }
 };
 
+
+
     return (
 
 
@@ -155,7 +158,10 @@ export default function CourseAssineAdd() {
 
                             {/* Bus Number */}
                             {/* Teacher Name */}
-                            <div>
+
+
+  
+                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">
                                     Student Id
                                 </label>
@@ -186,7 +192,7 @@ export default function CourseAssineAdd() {
                                     )}
 
                                 </select>
-                            </div>
+                            </div> 
 
 
 

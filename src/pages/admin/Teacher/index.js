@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Swal from "sweetalert2";
 
 import Loader from '../../../Components/Loader';
-import { ViewAll, DeleteTeacher, UpdateTeacher, UpdateTeacherStatus,ViewOne } from '../../../Service/admin/Teacher'
+import { ViewAll, DeleteTeacher, UpdateTeacher, UpdateTeacherStatus, ViewOne, SearchTeacher } from '../../../Service/admin/Teacher'
 
 import { FaEdit, FaTrash } from "react-icons/fa";
 import TeacherDeatials from './TeacherDeatials';
@@ -13,15 +13,25 @@ export default function TeacherList() {
   const [Teacher, setTeacher] = useState([])
   const [loader, setLoading] = useState(true)
   const [teacherDeatials, setTeacherDeatails] = useState(null)
-    const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(2)
+  const [limit, setLimit] = useState(10)
   const [totalPages, setTotalPages] = useState(1)
+
+  const [teacherName, setTeacherName] = useState("");
+
+  const [isSearching, setIsSearching] = useState(false);
 
 
   useEffect(() => {
-    getTeachers()
-  }, [page, limit])
+    if (isSearching) {
+      SearchTeacher();
+    } else {
+      getTeachers()
+
+    }
+
+  }, [page, limit, isSearching])
 
 
   const getTeachers = async () => {
@@ -149,19 +159,48 @@ export default function TeacherList() {
   };
 
   const handleViewTeacher = async (id) => {
-  try {
-    const res = await ViewOne(id);
+    try {
+      const res = await ViewOne(id);
 
-    console.log("Teacher Details:", res.data);
+      console.log("Teacher Details:", res.data);
 
-    // Response ke hisab se
-    setTeacherDeatails(res.data.data || res.data);
+      // Response ke hisab se
+      setTeacherDeatails(res.data.data || res.data);
 
-    setOpen(true);
-  } catch (error) {
-    console.log(error);
-  }
-};
+      setOpen(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const handleSearch = async () => {
+    try {
+      setLoading(true);
+
+      const body = {
+        teacherName: teacherName.trim(),
+      };
+
+
+      const res = await SearchTeacher(page, limit, body);
+
+      console.log("SEARCH RESPONSE:", res);
+
+      setTeacher(res.data || []);
+      setTotalPages(res.totalPages || 1);
+
+    } catch (error) {
+      console.log("SEARCH ERROR:", error);
+
+      setTeacher([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
 
   return (
     <div>
@@ -184,14 +223,59 @@ export default function TeacherList() {
 
         </div>
 
+        <div>
+          <form
+            onSubmit={handleSearch}
+            className="flex items-end gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-6"
+          >
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Teacher Name
+              </label>
+
+              <input
+                type="text"
+                value={teacherName}
+                onChange={(e) => setTeacherName(e.target.value)}
+                placeholder="Enter Teacher Name..."
+                className="w-full h-12 px-4 rounded-xl border border-slate-300 focus:border-violet-600 focus:ring-2 focus:ring-violet-100 outline-none"
+              />
+            </div>
+
+
+
+            <button
+              type="submit"
+              className="h-12 px-8 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold transition"
+            >
+              Search
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setTeacherName("");
+                setIsSearching(false);
+                setPage(1);
+              }}
+              className="h-12 px-6 rounded-xl bg-gray-500 text-white"
+            >
+              Clear
+            </button>
+          </form>
+
+
+
+        </div>
+
         {/* Table */}
         {/* Table */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
 
-           {loader ? (
+            {loader ? (
               <Loader />
-            ) : ( 
+            ) : (
 
 
               <div>
@@ -221,7 +305,7 @@ export default function TeacherList() {
                               onClick={(e) => {
                                 e.preventDefault();
                                 setOpen(true);
-                               handleViewTeacher(Teachers._id);
+                                handleViewTeacher(Teachers._id);
                               }}
                             >
                               {Teachers.TeacherName}
@@ -280,8 +364,7 @@ export default function TeacherList() {
                   </tbody>
 
                 </table>
-
-                <div className="flex items-center justify-between border-t border-white/10 px-4 py-3 sm:px-6">
+          <div className="flex items-center justify-end border-t border-white/10 px-4 py-3 sm:px-6">
 
                   <div className="flex flex-1 justify-between sm:hidden">
                     <button className="relative inline-flex items-center rounded-md border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-white/10">

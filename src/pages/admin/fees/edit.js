@@ -5,47 +5,57 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 
 import moment from "moment";
+import { ViewAllCourse } from '../../../Service/admin/Course'
+import { ViewAllStudent, } from '../../../Service/admin/collage'
+
 import { UpdateFees, FindFees } from "../../../Service/admin/collage";
 
 export default function Edit() {
     const [fees, setFees] = useState(null);
+    const [courses, setCourses] = useState([])
+
+    const [students, setStudents] = useState([])
 
     const navigate = useNavigate();
     const { id } = useParams();
     console.log("fees ID:", id);
 
     const fetchFees = async () => {
-  try {
-    const data = await FindFees(id);
+        try {
+            const data = await FindFees(id);
 
-    console.log("Fees Data:", data);
+            console.log("Fees Data:", data);
 
-    setFees(data);
-  } catch (error) {
-    console.log(error);
-  }
-};
+            setFees(data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
-useEffect(() => {
-  fetchFees();
-}, []); 
+    useEffect(() => {
+        fetchFees();
+    }, []);
+
+
 
     const formik = useFormik({
         enableReinitialize: true,
         initialValues: {
 
-            studentName: fees?.studentName || "",
-            courseName: fees?.courseName || "",
+            studentName:fees?.studentName?._id || "",
+            courseId: fees?.courseId?._id || "",
             totalFees: fees?.totalFees || "",
             discount: fees?.discount || 0,
             paidAmount: fees?.paidAmount || "",
             dueAmount: fees?.dueAmount || "",
-            paymentDate: fees?.paymentDate || "",
+            paymentDate: fees?.paymentDate
+                ? fees.paymentDate.split("T")[0]
+                : "",
         },
 
         validationSchema: Yup.object({
             studentName: Yup.string().required("Student Name Required"),
-            courseName: Yup.string().required("Course Name Required"),
+            courseId: Yup.string().required("Course Name Required"),
             totalFees: Yup.number().required("Total Fees Required"),
         }),
 
@@ -86,6 +96,37 @@ useEffect(() => {
         },
     });
 
+    useEffect(() => {
+
+        getStudents()
+    }, [])
+
+
+
+
+    const getStudents = async () => {
+        try {
+            const res = await ViewAllStudent();
+
+            console.log("STUDENT RESPONSE:", res);
+
+            setStudents(res?.data || res || []);
+
+        } catch (error) {
+            console.log("GET STUDENTS ERROR:", error);
+            setStudents([]);
+        }
+    };
+
+
+    useEffect(() => {
+        const fatchData = async () => {
+            const res = await ViewAllCourse();
+            setCourses(res.data);
+
+        }
+        fatchData()
+    }, [])
 
 
 
@@ -106,36 +147,59 @@ useEffect(() => {
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     <div>
                         <label>Student Name</label>
-                        <input
-                            type="text"
+
+                        <select
+
                             name="studentName"
-                            value={formik.values.studentName}
+                            value={formik.values.studentName||""}
                             onChange={formik.handleChange}
                             onBlur={formik.handleBlur}
                             className="w-full h-12 px-4 border rounded-xl"
-                        />
+                        >
+                            <option value="">Select Student</option>
+
+                            {students.map((item) => (
+                                <option key={item._id} value={item._id}>
+                                    {item.StudentName}
+                                </option>
+                            ))}
+                        </select>
+
+                        {formik.touched.studentName && formik.errors.studentName && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {formik.errors.studentName}
+                            </p>
+                        )}
+
 
                     </div>
                     <div>
-                        <label>Course Name</label>
+                        <label className="block mb-2 font-medium">
+                            Course Name
+                        </label>
 
                         <select
-                            type="text"
-                            name="courseName"
-                            value={formik.values.courseName}
+                            name="courseId"
+                            value={formik.values.courseId||""}
                             onChange={formik.handleChange}
                             className="w-full h-12 px-4 border rounded-xl"
                         >
-                             <option value="">Select Course</option>
-                                    <option value="MBA">MBA</option>
-                                    <option value="BCA">BCA</option>
-                                    <option value="B.TECH">B.TECH</option>
-                                    <option value="B.COM">B.COM</option>
-                                    <option value="BBA">BBA</option>
-                                    <option value="B.Ed.">B.Ed.</option>
-                                    <option value="M.Ed.">M.Ed.</option>
-                                    </select>
+                            <option value="">Select Course</option>
 
+                            {courses
+                                .filter((item) => item.status === "Active")
+                                .map((item) => (
+                                    <option key={item._id} value={item._id}>
+                                        {item.courseName}
+                                    </option>
+                                ))}
+                        </select>
+
+                        {formik.touched.courseName && formik.errors.courseName && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {formik.errors.courseName}
+                            </p>
+                        )}
                     </div>
                     <div>
                         <label>Total Fees</label>
@@ -213,7 +277,7 @@ useEffect(() => {
                             name="paymentDate"
                             value={
                                 formik.values.paymentDate
-                                   ? moment(formik.values.paymentDate).format("DD/MM/YYYY")
+                                    ? moment(formik.values.paymentDate).format("DD/MM/YYYY")
                                     : ""
                             }
                             onChange={formik.handleChange}

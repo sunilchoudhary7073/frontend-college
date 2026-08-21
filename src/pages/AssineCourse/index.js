@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 
 import Loader from "../../Components/Loader";
-import { ViewAllAssineCourse, deleteAssinecourse, updateAssinecourse,FindOneAssinecourse } from "../../Service/admin/AssineCourse";
+import { ViewAllAssineCourse, deleteAssinecourse, updateAssinecourse,FindOneAssinecourse,SearchAssinecourse } from "../../Service/admin/AssineCourse";
 
 import { FaEdit, FaTrash } from "react-icons/fa";
 
@@ -12,13 +12,24 @@ export default function AssignCourseList() {
     const [loader, setLoading] = useState(true);
 
     const [page, setPage] = useState(1);
-    const [limit] = useState(2);
+    const [limit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
 
-    useEffect(() => {
-        getAssinecourse();
-        handleFindOne()
-    }, [page, limit]);
+      const [studentName, setStudentName] = useState("");
+    
+      const [isSearching, setIsSearching] = useState(false);
+    
+
+  useEffect(() => {
+  if (isSearching) {
+    handleSearch();
+  } else {
+    getAssinecourse();
+   
+  }
+}, [page, limit, isSearching]);
+       
+   
 
 
     const getAssinecourse = async () => {
@@ -33,7 +44,7 @@ export default function AssignCourseList() {
 
             console.log("Assign Course Data:", res);
 
-            setAssinecourse(res || []);
+            setAssinecourse(res.data || []);
             setTotalPages(res?.totalPages || 1);
         } catch (error) {
             console.log("Get Assign Course Error:", error);
@@ -52,7 +63,7 @@ export default function AssignCourseList() {
     // DELETE
     // =========================
     const handleDelete = async (id) => {
-        const res = await Swal.fire({
+        const result = await Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
             icon: "warning",
@@ -61,7 +72,7 @@ export default function AssignCourseList() {
             cancelButtonText: "Cancel",
         });
 
-        if (!res.isConfirmed) {
+        if (!result.isConfirmed) {
             return;
         }
 
@@ -74,7 +85,7 @@ export default function AssignCourseList() {
                 icon: "success",
             });
 
-            getAssinecourse(res.data);
+            getAssinecourse(result.data);
         } catch (error) {
             console.log("Delete Error:", error);
 
@@ -135,6 +146,30 @@ export default function AssignCourseList() {
         }
     };
 
+   const handleSearch = async () => {
+  try {
+    setLoading(true);
+
+    const res = await SearchAssinecourse(
+      page,
+      limit,
+      studentName.trim()
+    );
+
+    console.log("SEARCH RESPONSE:", res);
+
+    setAssinecourse(res.data || []);
+    setTotalPages(res.totalPages || 1);
+
+  } catch (error) {
+    console.log("SEARCH ERROR:", error);
+
+    setAssinecourse([]);
+    setTotalPages(1);
+  } finally {
+    setLoading(false);
+  }
+};
 
     if (loader) {
         return <Loader />;
@@ -159,6 +194,52 @@ export default function AssignCourseList() {
                     </Link>
 
                 </div>
+                    <div>
+          <form
+            onSubmit={handleSearch}
+            className="flex items-end gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-6"
+          >
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Teacher Name
+              </label>
+
+              <input
+                type="text"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+                placeholder="Enter Teacher Name..."
+                className="w-full h-12 px-4 rounded-xl border border-slate-300 focus:border-violet-600 focus:ring-2 focus:ring-violet-100 outline-none"
+              />
+            </div>
+
+
+
+            <button
+              type="submit"
+              className="h-12 px-8 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold transition"
+            >
+              Search
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setStudentName("");
+                setIsSearching(false);
+                setPage(1);
+              }}
+              className="h-12 px-6 rounded-xl bg-gray-500 text-white"
+            >
+              Clear
+            </button>
+          </form>
+
+
+
+        </div>
+
+
 
                 {/* ================= TABLE ================= */}
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -280,63 +361,66 @@ export default function AssignCourseList() {
 
                         {/* ================= PAGINATION ================= */}
 
-                        <div className="flex items-center justify-between border-t border-slate-200 px-4 py-3 sm:px-6">
+                         <div className="flex items-center justify-end border-t border-white/10 px-4 py-3 sm:px-6">
 
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setPage((prev) => Math.max(prev - 1, 1))
-                                }
-                                disabled={page === 1}
-                                className={`relative inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium ${page === 1
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "hover:bg-slate-100"
-                                    }`}
-                            >
-                                Previous
-                            </button>
+                  <div className="flex flex-1 justify-between sm:hidden">
+                    <button className="relative inline-flex items-center rounded-md border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-white/10">
+                      Previous
+                    </button>
 
-                            <div className="flex items-center gap-1">
+                    <button className="relative ml-3 inline-flex items-center rounded-md border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-white/10">
+                      Next
+                    </button>
+                  </div>
 
-                                {[...Array(totalPages)].map((_, index) => {
 
-                                    const pageNumber = index + 1;
+                  <nav
+                    aria-label="Pagination"
+                    className="isolate inline-flex -space-x-px rounded-md"
+                  >
+                    {/* Previous */}
+                    <button
+                      onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={page === 1}
+                      className={`relative inline-flex items-center rounded-l-md px-2 py-2 ${page === 1
+                        ? "cursor-not-allowed opacity-50"
+                        : "hover:bg-white/5 cursor-pointer"
+                        }`}
+                    >
+                      Previous
+                    </button>
 
-                                    return (
-                                        <button
-                                            type="button"
-                                            key={pageNumber}
-                                            onClick={() => setPage(pageNumber)}
-                                            className={`px-4 py-2 rounded-md text-sm font-semibold ${page === pageNumber
-                                                ? "bg-indigo-500 text-white"
-                                                : "text-gray-700 hover:bg-slate-100"
-                                                }`}
-                                        >
-                                            {pageNumber}
-                                        </button>
-                                    );
+                    {/* Page Numbers */}
+                    {[...Array(totalPages)].map((_, index) => {
+                      const pageNumber = index + 1;
 
-                                })}
+                      return (
+                        <button
+                          key={pageNumber}
+                          onClick={() => setPage(pageNumber)}
+                          className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${page === pageNumber
+                            ? "bg-indigo-500 text-white"
+                            : "text-gray-200 hover:bg-white/5"
+                            }`}
+                        >
+                          {pageNumber}
+                        </button>
+                      );
+                    })}
 
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setPage((prev) =>
-                                        Math.min(prev + 1, totalPages)
-                                    )
-                                }
-                                disabled={page === totalPages}
-                                className={`relative inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium ${page === totalPages
-                                    ? "cursor-not-allowed opacity-50"
-                                    : "hover:bg-slate-100"
-                                    }`}
-                            >
-                                Next
-                            </button>
-
-                        </div>
+                    {/* Next */}
+                    <button
+                      onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                      disabled={page === totalPages}
+                      className={`relative inline-flex items-center rounded-r-md px-2 py-2 ${page === totalPages
+                        ? "cursor-not-allowed opacity-50"
+                        : "hover:bg-white/5 cursor-pointer"
+                        }`}
+                    >
+                      Next
+                    </button>
+                  </nav>
+                </div>
 
                     </div>
 

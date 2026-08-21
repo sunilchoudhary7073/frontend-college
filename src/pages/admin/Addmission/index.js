@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 
-import { ViewAlladdmission, DeleteAddmission, FindOneAddmission, approveAdmission, rejectAdmission } from "../../../Service/admin/collage";
+import { ViewAlladdmission, DeleteAddmission, FindOneAddmission, approveAdmission, rejectAdmission ,Searchaddmission} from "../../../Service/admin/collage";
 
 import { Image_url } from "../../../config/config";
 import AdmissionDetails from "./AdmissionDetails";
@@ -13,24 +13,33 @@ export default function AddmissionList() {
   const [open, setOpen] = useState(false);
   const [selectedaddmission, setSelectedAddmission] = useState(null);
   const [addmission, setAddmission] = useState([]);
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState(10)
+    const [totalPages, setTotalPages] = useState(1)
+    const studentNameRef = useRef(null);
+    const [isSearching, setIsSearching] = useState(false);
 
-  useEffect(() => {
+
+    
+useEffect(() => {
+  if (!isSearching) {
     getaddmission();
-
-  }, []);
+  }
+}, [page, limit, isSearching]);
 
   // =========================
   // GET ALL ADMISSION
   // =========================
   const getaddmission = async () => {
     try {
-      const res = await ViewAlladdmission();
+      const res = await ViewAlladdmission(page, limit);
 
       console.log("Admission Response:", res);
-
+setAddmission(res.data || res);
+      setTotalPages(res.totalPages)
       // Agar service direct array return kar rahi hai
       if (Array.isArray(res)) {
-        setAddmission(res);
+        setAddmission(res.data);
       }
 
       // Agar service {data: []} return kar rahi hai
@@ -262,6 +271,44 @@ export default function AddmissionList() {
     }
   };
 
+
+const handleSearch = async (e) => {
+  e.preventDefault();
+
+  try {
+    const studentName =
+      studentNameRef.current?.value?.trim() || "";
+
+    console.log("Student Name:", studentName);
+
+    if (!studentName) {
+      setIsSearching(false);
+      setPage(1);
+      return;
+    }
+
+    const res = await Searchaddmission(
+      1,
+      limit,
+      studentName
+    );
+
+    console.log("Search Response:", res);
+
+    setAddmission(
+      Array.isArray(res?.data) ? res.data : []
+    );
+
+    setTotalPages(res?.totalPages || 1);
+    setPage(1);
+    setIsSearching(true);
+
+  } catch (error) {
+    console.log("Search Error:", error);
+    setAddmission([]);
+    setTotalPages(1);
+  }
+};
   return (
     <div>
       <div className="space-y-6">
@@ -271,6 +318,37 @@ export default function AddmissionList() {
           <h2 className="text-2xl font-bold text-slate-800">
             New Admission List
           </h2>
+        </div>
+
+
+        <div>
+       <form
+  onSubmit={handleSearch}
+  className="flex items-end gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-6"
+>
+  <div className="flex-1">
+    <label className="block text-sm font-semibold text-slate-700 mb-2">
+      Student Name
+    </label>
+
+    <input
+      type="text"
+      ref={studentNameRef}
+      placeholder="Enter Student Name..."
+      className="w-full h-12 px-4 rounded-xl border border-slate-300 focus:border-violet-600 focus:ring-2 focus:ring-violet-100 outline-none"
+    />
+  </div>
+
+  <button
+    type="submit"
+    className="h-12 px-8 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold transition"
+  >
+    Search
+  </button>
+</form>
+
+
+
         </div>
 
         {/* ================= TABLE ================= */}
@@ -365,32 +443,32 @@ export default function AddmissionList() {
                           }
                           className="text-blue-600 hover:text-blue-800 hover:underline"
                         >
-                       {item.fullName || "-"}
-  </button>
-</td>
+                          {item.fullName || "-"}
+                        </button>
+                      </td>
 
 
 
-{/* MOBILE */}
-<td className="px-5 py-4">
-  {item.mobile || "-"}
-</td>
+                      {/* MOBILE */}
+                      <td className="px-5 py-4">
+                        {item.mobile || "-"}
+                      </td>
 
-{/* COURSE */}
-<td className="px-5 py-4">
- {item.courseId?.courseName}
-</td>
+                      {/* COURSE */}
+                      <td className="px-5 py-4">
+                        {item.courseId?.courseName}
+                      </td>
 
-{/* APPLICATION NUMBER */}
-{/* <td className="px-5 py-4">
+                      {/* APPLICATION NUMBER */}
+                      {/* <td className="px-5 py-4">
   {item.applicationNo || "-"}
 </td> */}
 
-{/* ADMISSION DATE */}
-<td className="px-5 py-4">
-  {item.createdAt
-    ? new Date(item.createdAt).toLocaleDateString("en-GB")
-    : "-"}
+                      {/* ADMISSION DATE */}
+                      <td className="px-5 py-4">
+                        {item.createdAt
+                          ? new Date(item.createdAt).toLocaleDateString("en-GB")
+                          : "-"}
 
                       </td>
 
@@ -400,10 +478,10 @@ export default function AddmissionList() {
                       <td className="px-5 py-4">
                         <span
                           className={`px-3 py-1 rounded-full text-sm font-medium ${item.status === "Approved"
-                              ? "bg-green-100 text-green-700"
-                              : item.status === "Rejected"
-                                ? "bg-red-100 text-red-700"
-                                : "bg-yellow-100 text-yellow-700"
+                            ? "bg-green-100 text-green-700"
+                            : item.status === "Rejected"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-yellow-100 text-yellow-700"
                             }`}
                         >
                           {item.status || "Pending"}
@@ -478,6 +556,67 @@ export default function AddmissionList() {
               </tbody>
 
             </table>
+
+         <div className="flex items-center justify-end border-t border-white/10 px-4 py-3 sm:px-6">
+
+                <div className="flex flex-1 justify-between sm:hidden">
+                  <button className="relative inline-flex items-center rounded-md border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-white/10">
+                    Previous
+                  </button>
+
+                  <button className="relative ml-3 inline-flex items-center rounded-md border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-white/10">
+                    Next
+                  </button>
+                </div>
+
+
+                <nav
+                  aria-label="Pagination"
+                  className="isolate inline-flex -space-x-px rounded-md"
+                >
+                  {/* Previous */}
+                  <button
+                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={page === 1}
+                    className={`relative inline-flex items-center rounded-l-md px-2 py-2 ${page === 1
+                      ? "cursor-not-allowed opacity-50"
+                      : "hover:bg-white/5 cursor-pointer"
+                      }`}
+                  >
+                    Previous
+                  </button>
+
+                  {/* Page Numbers */}
+                  {[...Array(totalPages)].map((_, index) => {
+                    const pageNumber = index + 1;
+
+                    return (
+                      <button
+                        key={pageNumber}
+                        onClick={() => setPage(pageNumber)}
+                        className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${page === pageNumber
+                          ? "bg-indigo-500 text-white"
+                          : "text-gray-200 hover:bg-white/5"
+                          }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  })}
+
+                  {/* Next */}
+                  <button
+                    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={page === totalPages}
+                    className={`relative inline-flex items-center rounded-r-md px-2 py-2 ${page === totalPages
+                      ? "cursor-not-allowed opacity-50"
+                      : "hover:bg-white/5 cursor-pointer"
+                      }`}
+                  >
+                    Next
+                  </button>
+                </nav>
+              </div>
 
           </div>
 

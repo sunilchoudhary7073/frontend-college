@@ -40,3 +40,17 @@ export const DeleteTeacher = async (id,data) => {
     const res = await axios.delete(`${API_url}/Teacher/delete/${id}`, data)
     return res
 }
+
+export const SearchTeacher = async (page, limit, data) => {
+  try {
+    const res = await axios.post(
+      `${API_url}/Teacher/Search-Teacher?page=${page}&limit=${limit}`,
+      data
+    );
+
+    return res.data;
+  } catch (error) {
+    console.log("Search Teacher API Error:", error);
+    throw error;
+  }
+};

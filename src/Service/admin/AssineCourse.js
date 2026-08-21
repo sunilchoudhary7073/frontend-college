@@ -8,7 +8,7 @@ export const AddCourseAssine = async (data) => {
 
 export const ViewAllAssineCourse = async (page,limit) => {
     const res = await axios.get(`${API_url}/Assinecourse/viewAll?page=${page}&limit=${limit}`);
-    return res.data.data;
+    return res.data;
 };
 
 export const FindOneAssinecourse = async (id, data) => {
@@ -24,4 +24,15 @@ export const updateAssinecourse = async (id, data) => {
 export const deleteAssinecourse = async (id) => {
     const res = await axios.delete(`${API_url}/Assinecourse/delete/${id}`);
     return res.data;
+};
+
+export const SearchAssinecourse = async (page, limit, studentName) => {
+  const res = await axios.post(
+    `${API_url}/Assinecourse/Search?page=${page}&limit=${limit}`,
+    {
+      studentName: studentName,
+    }
+  );
+
+  return res.data;
 };

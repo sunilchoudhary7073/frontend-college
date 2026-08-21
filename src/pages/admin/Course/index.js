@@ -262,7 +262,7 @@ export default function Course() {
                 </tbody>
 
               </table>
-              <div className="flex items-center justify-between border-t border-white/10 px-4 py-3 sm:px-6">
+             <div className="flex items-center justify-end border-t border-white/10 px-4 py-3 sm:px-6">
 
                 <div className="flex flex-1 justify-between sm:hidden">
                   <button className="relative inline-flex items-center rounded-md border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-white/10">

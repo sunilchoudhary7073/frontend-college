@@ -41,7 +41,14 @@ export const Delete = async (id, data) => {
   const res = await axios.delete(`${API_url}/Student/deletestudent/${id}`, data)
   return res
 }
+export const SearchStudent = async (page, limit, body) => {
+  const res = await axios.post(
+    `${API_url}/Student/SearchStudent?page=${page}&limit=${limit}`,
+    body
+  );
 
+  return res.data;
+};
 export const AssignCourse = async (data) => {
   const res = await axios.patch( `${API_url}/student/assign-course`, data);
   return res.data;
@@ -82,6 +89,16 @@ export const DeleteFees = async (id) => {
   return res;
 };
 
+export const Searchfees = async (page, limit, body) => {
+    const res = await axios.post(
+        `${API_url}/Fees/seacrh-fees?page=${page}&limit=${limit}`,
+        {
+            studentName: body
+        }
+    );
+
+    return res.data;
+};
 
 
 // Bacth api
@@ -123,9 +140,9 @@ export const Addaddmission = async (data) => {
   return res
 }
 
-export const ViewAlladdmission = async (data) => {
-  const res = await axios.get(`${API_url}/admission/ViewAll`)
-  return res.data.data
+export const ViewAlladdmission = async (page,limit) => {
+  const res = await axios.get(`${API_url}/admission/ViewAll?page=${page}&limit=${limit}`)
+  return res.data
 }
 
 export const FindOneAddmission = async (id) => {
@@ -154,4 +171,14 @@ export const UpdateAdmission = async (id) => {
 export const DeleteAddmission = async (id) => {
   const res = await axios.delete(`${API_url}/admission/delete/${id}`);
   return res
+};
+export const Searchaddmission = async (page, limit, fullName) => {
+  const res = await axios.post(
+    `${API_url}/admission/search-addmission?page=${page}&limit=${limit}`,
+    {
+      fullName: fullName,
+    }
+  );
+
+  return res.data;
 };

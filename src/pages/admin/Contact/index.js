@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+
 import Swal from "sweetalert2";
 
 import Loader from "../../../Components/Loader";
@@ -75,7 +75,7 @@ export default function ContactList() {
 
   const handeleDelete = async (id) => {
 
-    const result = await Swal.fire({
+    const res = await Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
       icon: "warning",
@@ -84,7 +84,7 @@ export default function ContactList() {
     })
 
 
-    if (result.isConfirmed) {
+    if (res.isConfirmed) {
 
       try {
 
@@ -98,7 +98,7 @@ export default function ContactList() {
         });
 
 
-        getContact(); // refresh list
+        getContact(res.data); // refresh list
 
 
       } catch (error) {
@@ -276,7 +276,7 @@ export default function ContactList() {
 
                 </table>
 
-                <div className="flex items-center justify-between border-t border-white/10 px-4 py-3 sm:px-6">
+               <div className="flex items-center justify-end border-t border-white/10 px-4 py-3 sm:px-6">
 
                   <div className="flex flex-1 justify-between sm:hidden">
                     <button className="relative inline-flex items-center rounded-md border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-white/10">

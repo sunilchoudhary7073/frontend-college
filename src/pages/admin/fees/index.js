@@ -6,7 +6,7 @@ import Loader from '../../../Components/Loader';
 
 import FeesDetails from '../fees/FeesDeatails'
 
-import { ViewAllfees, DeleteFees, UpdateFees } from "../../../Service/admin/collage";
+import { ViewAllfees, DeleteFees, UpdateFees,Searchfees } from "../../../Service/admin/collage";
 
 export default function FeesList() {
 
@@ -16,11 +16,21 @@ export default function FeesList() {
 
   const [fees, setfees] = useState([]);
 
+
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(6)
   const [totalPages, setTotalPages] = useState(1)
 
 
+    const [studentName, setStudentName] = useState("");
+  
+    const [isSearching, setIsSearching] = useState(false);
+
+
+
+useEffect(() => {
+    fetchData();
+}, [page, limit]);
 
   const fetchData = async () => {
     try {
@@ -38,9 +48,7 @@ export default function FeesList() {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [page, limit]);
+
 
   const handleDelete = async (id) => {
     const result = await Swal.fire({
@@ -76,10 +84,38 @@ export default function FeesList() {
     }
   };
 
+  
 
 
 
-  // return (...)
+const handleSearch = async (e) => {
+    e.preventDefault();
+
+    try {
+        setLoading(true);
+
+        const body = {
+            studentName: studentName.trim()
+        };
+
+        const res = await Searchfees(1, limit, body);
+
+        console.log("SEARCH RESPONSE:", res);
+
+        setfees(res.data || []);
+        setTotalPages(res.totalPages || 1);
+
+    } catch (error) {
+        console.log("SEARCH ERROR:", error);
+        setfees([]);
+        setTotalPages(1);
+    } finally {
+        setLoading(false);
+    }
+};
+
+
+
 
 
   return (
@@ -100,6 +136,52 @@ export default function FeesList() {
             <i data-lucide="plus" className="w-5 h-5"></i>
             <span>Add fees</span>
           </Link>
+
+        </div>
+
+
+        <div>
+          <form
+            onSubmit={handleSearch}
+            className="flex items-end gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-6"
+          >
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Student  Name
+              </label>
+
+              <input
+                type="text"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+                placeholder="Enter Teacher Name..."
+                className="w-full h-12 px-4 rounded-xl border border-slate-300 focus:border-violet-600 focus:ring-2 focus:ring-violet-100 outline-none"
+              />
+            </div>
+
+
+
+            <button
+              type="submit"
+              className="h-12 px-8 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold transition"
+            >
+              Search
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setStudentName("");
+                setIsSearching(false);
+                setPage(1);
+              }}
+              className="h-12 px-6 rounded-xl bg-gray-500 text-white"
+            >
+              Clear
+            </button>
+          </form>
+
+
 
         </div>
 
@@ -162,14 +244,14 @@ export default function FeesList() {
 
 
                         >
-                          {fees.studentName}
+                          {fees.studentName?.StudentName}
                         </Link>
                       </td>
 
 
 
 
-                      <td className="px-5 py-4">{fees.courseName}</td>
+                      <td className="px-5 py-4">{fees.courseId?.courseName}</td>
                       <td className="px-5 py-4">₹{fees.totalFees}</td>
                       <td className="px-5 py-4">₹{fees.discount}</td>
                       <td className="px-5 py-4">₹{fees.paidAmount}</td>
@@ -211,7 +293,7 @@ export default function FeesList() {
               </table>
 
 
-              <div className="flex items-center justify-between border-t border-white/10 px-4 py-3 sm:px-6">
+            <div className="flex items-center justify-end border-t border-white/10 px-4 py-3 sm:px-6">
 
                 <div className="flex flex-1 justify-between sm:hidden">
                   <button className="relative inline-flex items-center rounded-md border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-white/10">

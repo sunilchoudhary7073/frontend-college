@@ -1,108 +1,336 @@
-body{
-    margin:0;
-    font-family:Inter,sans-serif;
-    background:#f5f7fb;
+/* ================================
+   MAIN PAGE
+================================ */
+
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111827;
 }
 
-.login-wrapper{
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    background:#f5f7fb;
+
+/* ================================
+   UNIVERSITY BACKGROUND
+================================ */
+
+.university-background {
+  position: fixed;
+  inset: -5%;
+  width: 110%;
+  height: 110%;
+
+ background-image: url("../assets/university-background.jpg");
+  background-size: cover;
+  background-position: center;
+
+  z-index: 0;
+
+  animation: universityZoom 18s ease-in-out infinite alternate;
 }
 
-.logo{
-    display:flex;
-    align-items:center;
-    gap:15px;
-    font-size:40px;
-    font-weight:700;
-    color:#7C3AED;
-    margin-bottom:30px;
+
+/* ================================
+   VIDEO LIKE ZOOM EFFECT
+================================ */
+
+@keyframes universityZoom {
+
+  0% {
+    transform: scale(1);
+    background-position: center center;
+  }
+
+  50% {
+    transform: scale(1.08);
+    background-position: 55% 45%;
+  }
+
+  100% {
+    transform: scale(1.15);
+    background-position: 45% 55%;
+  }
+
 }
 
-.bus-icon{
-    width:60px;
-    height:60px;
-    background:#7C3AED;
-    color:#fff;
-    border-radius:14px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:30px;
+
+/* ================================
+   DARK OVERLAY
+================================ */
+
+.background-overlay {
+  position: fixed;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.72),
+      rgba(0, 0, 0, 0.40),
+      rgba(0, 0, 0, 0.70)
+    );
+
+  z-index: 1;
 }
 
-.card{
-    width:520px;
-    background:#fff;
-    padding:45px;
-    border-radius:22px;
-    box-shadow:0 20px 50px rgba(0,0,0,.10);
+
+/* ================================
+   LOGIN WRAPPER
+================================ */
+
+.login-wrapper {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  max-width: 520px;
+
+  padding: 20px;
 }
 
-.card h2{
-    font-size:34px;
-    text-align:center;
-    margin-bottom:10px;
+
+/* ================================
+   LOGIN CARD
+================================ */
+
+.card {
+  width: 100%;
+
+  background: rgba(255, 255, 255, 0.96);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-radius: 18px;
+
+  padding: 40px;
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.35);
+
+  animation: cardAppear 0.8s ease;
 }
 
-.card p{
-    text-align:center;
-    color:#6b7280;
-    margin-bottom:35px;
-    font-size:18px;
+
+@keyframes cardAppear {
+
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
 }
 
-.input-group{
-    margin-bottom:25px;
+
+/* ================================
+   TITLE
+================================ */
+
+.card h2 {
+  text-align: center;
+
+  font-size: 30px;
+  font-weight: 700;
+
+  color: #1f2937;
+
+  margin-bottom: 8px;
 }
 
-.input-group label{
-    display:block;
-    margin-bottom:10px;
-    font-size:18px;
-    font-weight:600;
+
+.card > p {
+  text-align: center;
+
+  color: #6b7280;
+
+  margin-bottom: 30px;
 }
 
-.input-group input{
-    width:100%;
-    height:60px;
-    padding:0 18px;
-    font-size:18px;
-    border:1px solid #ddd;
-    border-radius:12px;
-    outline:none;
-    transition:.3s;
+
+/* ================================
+   INPUT
+================================ */
+
+.input-group {
+  margin-bottom: 20px;
 }
 
-.input-group input:focus{
-    border-color:#7C3AED;
-    box-shadow:0 0 0 4px rgba(124,58,237,.15);
+
+.input-group label {
+  display: block;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #374151;
+
+  margin-bottom: 7px;
 }
 
-.btn{
-    width:100%;
-    height:60px;
-    border:none;
-    border-radius:12px;
-    background:linear-gradient(90deg,#7C3AED,#9333EA);
-    color:#fff;
-    font-size:22px;
-    font-weight:700;
-    cursor:pointer;
-    margin-top:10px;
+
+.input-group input {
+  width: 100%;
+
+  padding: 13px 15px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 9px;
+
+  outline: none;
+
+  font-size: 14px;
+
+  transition: all 0.25s ease;
+
+  box-sizing: border-box;
 }
 
-.btn:hover{
-    background:linear-gradient(90deg,#6D28D9,#7E22CE);
+
+.input-group input:focus {
+
+  border-color: #7c3aed;
+
+  box-shadow:
+    0 0 0 3px rgba(124, 58, 237, 0.12);
+
 }
 
-.footer-text{
-    margin-top:25px;
-    text-align:center;
-    color:#6b7280;
-    font-size:16px;
+
+/* ================================
+   FORGOT PASSWORD
+================================ */
+
+.forgot-wrapper {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-bottom: 18px;
 }
+
+
+.forgot-btn {
+
+  background: none;
+
+  border: none;
+
+  padding: 0;
+
+  color: #7c3aed;
+
+  cursor: pointer;
+
+  font-size: 14px;
+
+  font-weight: 600;
+}
+
+
+.forgot-btn:hover {
+
+  text-decoration: underline;
+
+}
+
+
+/* ================================
+   LOGIN BUTTON
+================================ */
+
+.btn {
+
+  width: 100%;
+
+  border: none;
+
+  padding: 14px;
+
+  border-radius: 9px;
+
+  background: #7c3aed;
+
+  color: white;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+}
+
+
+.btn:hover {
+
+  background: #6d28d9;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 8px 20px rgba(124, 58, 237, 0.35);
+
+}
+
+
+.btn:disabled {
+
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+}
+
+
+/* ================================
+   FOOTER
+================================ */
+
+.footer-text {
+
+  text-align: center;
+
+  margin-top: 25px;
+
+  color: #9ca3af;
+
+  font-size: 13px;
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 600px) {
+
+  .login-wrapper {
+    padding: 15px;
+  }
+
+  .card {
+    padding: 28px 22px;
+  }
+
+  .card h2 {
+    font-size: 25px;
+  }
+
+}
+
+
+
+
+

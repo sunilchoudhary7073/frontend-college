@@ -20,6 +20,7 @@ import EventRegister from "./pages/frontend/EventRegister.js";
 import AdmissionApplication from "./pages/frontend/AdmissionApplication.js";
 import Faculty from "./pages/frontend/Faculty.js";
 
+
 // ================= ADMIN =================
 
 import AdminLayout from "./Components/Layout";
@@ -76,6 +77,7 @@ import AddPlacment from "./pages/admin/Placement/Add.js";
 // Assign Course
 import AssignCourseList from "./pages/AssineCourse/index.js";
 import CourseAssineAdd from "./pages/AssineCourse/Add.js";
+import CourseAssineEdit from "./pages/AssineCourse/Edit.js";
 
 // Subject
 import SubjectList from "./pages/admin/Subject/index.js";
@@ -89,9 +91,6 @@ function App() {
 
       <Routes>
 
-        {/* =====================================================
-            PUBLIC FRONTEND ROUTES
-        ===================================================== */}
 
         <Route path="/" element={<Home />} />
 
@@ -102,289 +101,147 @@ function App() {
           element={<Programs />}
         />
 
-        <Route
-          path="/addmissions"
-          element={<Addmission />}
-        />
-
-        <Route
-          path="/inquiryPage"
-          element={<InquiryPage />}
-        />
-
-        <Route
-          path="/admission-application"
-          element={<AdmissionApplication />}
-        />
-
-        <Route
-          path="/placements"
-          element={<Placements />}
-        />
-
-        <Route
-          path="/contact"
-          element={<Contact />}
-        />
-
-        <Route
-          path="/student-life"
-          element={<StudentLife />}
-        />
-
-        <Route
-          path="/login"
-          element={<Login />}
-        />
-
-         <Route
-          path="/forgot-password"
-          element={<ForgotPassword />}
-        />
+        <Route path="/addmissions"element={<Addmission />}/>
 
-        <Route
-          path="/profile"
-          element={<Profile />}
-        />
+        <Route path="/inquiryPage"element={<InquiryPage />}/>
 
-        <Route
-          path="/register"
-          element={<Register />}
-        />
-
-        <Route
-          path="/program/:id"
-          element={<ProgramDetails />}
-        />
+        <Route path="/admission-application"element={<AdmissionApplication />}/>
+ 
 
-        <Route
-          path="/event/:id"
-          element={<EventDetail />}
-        />
+        <Route path="/placements" element={<Placements />} />
 
-        <Route
-          path="/register/:id"
-          element={<EventRegister />}
-        />
+        <Route path="/contact"element={<Contact />}/>
 
-        <Route
-          path="/faculty-deatials"
-          element={<Faculty />}
-        />
-
-
-        {/* =====================================================
-            ADMIN LOGIN
-        ===================================================== */}
+        <Route path="/student-life" element={<StudentLife />} />
 
-        <Route
-          path="/admin/login"
-          element={<AdminLogin />}
-        />
+        <Route path="/login"element={<Login />}/>
 
+         <Route path="/forgot-password"element={<ForgotPassword />}/>
 
-        {/* =====================================================
-            PROTECTED ADMIN ROUTES
-        ===================================================== */}
+        <Route path="/profile"element={<Profile />}/>
 
-        <Route element={<AdminProtectedRoute />}>
+        <Route path="/register" element={<Register />}/>
 
-          <Route
-            path="/admin"
-            element={<AdminLayout />}
-          >
+        <Route path="/program/:id"element={<ProgramDetails />}/>
 
-            {/* ================= DASHBOARD ================= */}
+        <Route path="/event/:id"element={<EventDetail />}/>
 
-            <Route
-              path="deshboard"
-              element={<Deshboard />}
-            />
+        <Route path="/register/:id"element={<EventRegister />}/>
 
+        <Route path="/faculty-deatials"element={<Faculty />}/>
 
-            {/* ================= TEACHER ================= */}
 
-            <Route
-              path="Teacher"
-              element={<TeacherList />}
-            />
+       
 
-            <Route
-              path="Teacher/add"
-              element={<TeacherAdd />}
-            />
+        <Route path="/admin/login" element={<AdminLogin />}/>
 
-            <Route
-              path="Teacher/edit/:id"
-              element={<TeacherEdit />}
-            />
+     
 
+<Route path="/admin" element={<AdminProtectedRoute />}>
 
-            {/* ================= STUDENT ================= */}
+  <Route element={<AdminLayout />}>
 
-            <Route
-              path="student"
-              element={<StudentList />}
-            />
+  
 
-            <Route
-              path="student/add"
-              element={<Studentadd />}
-            />
+    <Route path="deshboard"element={<Deshboard />}/>
 
-            <Route
-              path="student/edit/:id"
-              element={<StudentEdit />}
-            />
 
 
-            {/* ================= COURSE ================= */}
 
-            <Route
-              path="Course"
-              element={<CourseList />}
-            />
+    <Route path="Teacher"element={<TeacherList />}/>
 
-            <Route
-              path="Course/add"
-              element={<Courseadd />}
-            />
+    <Route path="Teacher/add"element={<TeacherAdd />}/>
 
-            <Route
-              path="Course/edit/:id"
-              element={<CourseEdit />}
-            />
+    <Route path="Teacher/edit/:id"element={<TeacherEdit />}/>
 
 
-            {/* ================= SUBJECT ================= */}
+   
 
-            <Route
-              path="subject"
-              element={<SubjectList />}
-            />
+    <Route path="student"element={<StudentList />}/>
 
-            <Route
-              path="subject/add"
-              element={<AddSubjects />}
-            />
+    <Route path="student/add"element={<Studentadd />}/>
 
-            <Route
-              path="subject/edit/:id"
-              element={<SubjectsEdit />}
-            />
+    <Route path="student/edit/:id"element={<StudentEdit />}/>
 
 
-            {/* ================= FEES ================= */}
+   
 
-            <Route
-              path="fees"
-              element={<FeesList />}
-            />
+    <Route path="Course" element={<CourseList />}/>
 
-            <Route
-              path="fees/add"
-              element={<Feesadd />}
-            />
+    <Route path="Course/add"element={<Courseadd />}/>
 
-            <Route
-              path="fees/edit/:id"
-              element={<FeesEdit />}
-            />
+    <Route path="Course/edit/:id" element={<CourseEdit />}/>
 
 
 
+    <Route path="subject"element={<SubjectList />}/>
 
-            <Route
-              path="Batch"
-              element={<BatchList />}
-            />
+    <Route path="subject/add"element={<AddSubjects />}/>
 
-            <Route
-              path="Batch/add"
-              element={<BatchAdd />}
-            />
+    <Route path="subject/edit/:id"element={<SubjectsEdit />}/>
 
 
-      
 
-            <Route
-              path="addmissions"
-              element={<AddmissionList />}
-            />
 
-            <Route
-              path="addmissions/add"
-              element={<AddmissionAdd />}
-            />
+    <Route path="fees" element={<FeesList />}/>
 
-            <Route
-              path="addmissions/edit/:id"
-              element={<EditAddmission />}
-            />
+    <Route path="fees/add"element={<Feesadd />}/>
 
+    <Route path="fees/edit/:id"element={<FeesEdit />}/>
 
-            {/* ================= EVENT ================= */}
 
-            <Route
-              path="Event"
-              element={<EventList />}
-            />
 
-            <Route
-              path="Event/add"
-              element={<AddEvent />}
-            />
 
+    <Route path="Batch"element={<BatchList />}/>
 
-            {/* ================= NOTICE ================= */}
+    <Route path="Batch/add"element={<BatchAdd />}/>
 
-            <Route
-              path="notice"
-              element={<NoticeList />}
-            />
 
-            <Route
-              path="notice/add"
-              element={<Addnotice />}
-            />
 
 
-            {/* ================= CONTACT ================= */}
+    <Route path="addmissions"element={<AddmissionList />}/>
 
-            <Route
-              path="contact"
-              element={<ContactList />}
-            />
+    <Route path="addmissions/add" element={<AddmissionAdd />}/>
 
+    <Route path="addmissions/edit/:id"element={<EditAddmission />} />
 
-            {/* ================= PLACEMENT ================= */}
 
-            <Route
-              path="placment"
-              element={<PlacementList />}
-            />
 
-            <Route
-              path="placment/add"
-              element={<AddPlacment />}
-            />
 
+    <Route path="Event"element={<EventList />}/>
 
-            {/* ================= ASSIGN COURSE ================= */}
+    <Route path="Event/add" element={<AddEvent />}/>
 
-            <Route
-              path="assine-course"
-              element={<AssignCourseList />}
-            />
 
-            <Route
-              path="assine-course/add"
-              element={<CourseAssineAdd />}
-            />
 
-          </Route>
 
-        </Route>
+    <Route path="notice"element={<NoticeList />}/>
+
+    <Route path="notice/add"  element={<Addnotice />} />
+
+
+
+
+    <Route path="contact"element={<ContactList />}/>
+
+
+
+    <Route path="placment"element={<PlacementList />}/>
+
+    <Route path="placment/add" element={<AddPlacment />}/>
+
+
+   
+   
+
+    <Route path="assine-course" element={<AssignCourseList />}/>
+
+    <Route path="assine-course/add"element={<CourseAssineAdd />}/>
+    <Route path="assine-course/edit/:id"element={<CourseAssineEdit />}/>
+
+  </Route>
+
+</Route>
 
       </Routes>
 

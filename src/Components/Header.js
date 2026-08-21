@@ -26,7 +26,7 @@ export default function Header() {
               />
 
               <h1 className="text-[42px] font-extrabold tracking-tight text-violet-600">
-                Jaat University
+                {/* Jaat University */}
               </h1>
             </a>
 
